@@ -17,6 +17,12 @@ REGEX = compile_pattern()
     ("v01 c003", 1, "3"),
     ("c003", None, "3"),
     ("Chapter 12.5", None, "12.5"),
+    ("Vol.TBD Ch.93", None, "93"),
+    ("[Group] Vol.02 Ch.0010", 2, "10"),
+    ("Chainsaw Man Chapter 5", None, "5"),
+    ("Ch. 7 - The Title", None, "7"),
+    ("093", None, "93"),
+    ("12.5 - Extra", None, "12.5"),
 ])
 def test_parse_name(name, volume, chapter):
     parsed = parse_name(name, REGEX)
@@ -29,7 +35,7 @@ def test_parse_name_metadata():
     assert (parsed.title, parsed.language, parsed.group) == ("Cerea Prologue", "en", "Monster Musume")
 
 
-@pytest.mark.parametrize("name", ["Cerea", "Extras", "Vol.01", "cover"])
+@pytest.mark.parametrize("name", ["Cerea", "Extras", "Vol.01", "cover", "Covers v2"])
 def test_parse_name_rejects(name):
     assert parse_name(name, REGEX) is None
 

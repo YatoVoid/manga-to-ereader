@@ -5,6 +5,7 @@ import sys
 from pathlib import Path
 
 from PySide6.QtCore import QObject, Qt, QThread, Signal
+from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import (
     QAbstractItemView, QApplication, QCheckBox, QComboBox, QFileDialog, QGridLayout, QHBoxLayout,
     QHeaderView, QInputDialog, QLabel, QLineEdit, QMainWindow, QMessageBox, QPlainTextEdit,
@@ -26,6 +27,7 @@ STATUS_TEXT = {
 }
 TRAILING_LABELS = {"last": "add to last volume", "new": "new volume", "skip": "leave out"}
 FLAG_KINDS = ("guessed", "short", "empty", "duplicate")
+ICON = Path(__file__).with_name("icon.png")
 COL_FILE, COL_STATUS, COL_PAGES, COL_CHAPTERS, COL_NOTES = range(5)
 
 
@@ -53,8 +55,9 @@ class MainWindow(QMainWindow):
         self.project: Project | None = None
         self.history: list[list[Bundle]] = []
         self.flags: dict[int, list[str]] = {}
-        self.thread: QThread | None = None
+        self.build_thread: QThread | None = None
         self._auto_out = ""
+        self._auto_series = ""
 
         self.folder_edit = QLineEdit()
         self.out_edit = QLineEdit()
@@ -193,13 +196,17 @@ class MainWindow(QMainWindow):
         if not self.out_edit.text().strip() or self.out_edit.text() == self._auto_out:
             self._auto_out = str(default_out_dir(root))
             self.out_edit.setText(self._auto_out)
-        if not self.series_edit.text().strip():
+        if not self.series_edit.text().strip() or self.series_edit.text() == self._auto_series:
+            self._auto_series = root.name
             self.series_edit.setText(root.name)
         settings = Settings(per=self.per_combo.currentText(), trailing=self.trailing_combo.currentData())
         try:
             project = load_project(root, settings, exclude=(Path(self.out_edit.text()),))
         except (InputError, OSError) as e:
             self.say(f"error: {e}")
+            self.project = None
+            self.history.clear()
+            self.refresh()
             return
         self.project = project
         self.history.clear()
@@ -365,14 +372,14 @@ class MainWindow(QMainWindow):
         self.progress.setValue(0)
         self.progress.show()
 
-        self.thread = QThread(self)
+        self.build_thread = QThread(self)
         self.worker = BuildWorker(actions, opts, manifest)
-        self.worker.moveToThread(self.thread)
-        self.thread.started.connect(self.worker.run)
+        self.worker.moveToThread(self.build_thread)
+        self.build_thread.started.connect(self.worker.run)
         self.worker.progress.connect(self.on_progress)
         self.worker.finished.connect(self.on_finished)
-        self.worker.finished.connect(self.thread.quit)
-        self.thread.start()
+        self.worker.finished.connect(self.build_thread.quit)
+        self.build_thread.start()
 
     def on_progress(self, text: str) -> None:
         self.say(text)
@@ -386,14 +393,18 @@ class MainWindow(QMainWindow):
             self.say(f"build stopped: {report}")
         else:
             for action, pages in report.written:
-                self.say(f"wrote {action.target.name}: {pages} pages, {action.target.stat().st_size / 1e6:.1f} MB")
+                try:
+                    size = f", {action.target.stat().st_size / 1e6:.1f} MB"
+                except OSError:
+                    size = ""
+                self.say(f"wrote {action.target.name}: {pages} pages{size}")
             for action, error in report.failed:
                 self.say(f"failed {action.target.name}: {error}")
             self.say(f"done: {len(report.written)} files, {report.pages} pages")
         self.refresh()
 
     def closeEvent(self, event) -> None:
-        if self.thread is not None and self.thread.isRunning():
+        if self.build_thread is not None and self.build_thread.isRunning():
             QMessageBox.information(self, "Build running", "Wait for the build to finish before closing.")
             event.ignore()
             return
@@ -402,6 +413,9 @@ class MainWindow(QMainWindow):
 
 def main(folder: Path | None = None) -> int:
     app = QApplication.instance() or QApplication(sys.argv)
+    app.setApplicationName("Tankobon")
+    app.setDesktopFileName("tankobon")
+    app.setWindowIcon(QIcon(str(ICON)))
     window = MainWindow(folder)
     window.show()
     return app.exec()

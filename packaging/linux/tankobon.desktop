@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Tankobon
+GenericName=Manga CBZ Packer
+Comment=Pack manga chapters into one ordered .cbz per volume
+Exec=tankobon-gui %f
+Icon=tankobon
+Terminal=false
+Categories=Graphics;Utility;
+Keywords=manga;comic;cbz;volume;e-reader;

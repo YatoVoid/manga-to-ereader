@@ -20,7 +20,7 @@ class ScanResult:
     issues: list[Issue] = field(default_factory=list)
 
 
-def scan(root: Path, regex: re.Pattern, max_depth: int = 3, exclude: tuple[Path, ...] = ()) -> ScanResult:
+def scan(root: Path, patterns: list[re.Pattern], max_depth: int = 3, exclude: tuple[Path, ...] = ()) -> ScanResult:
     """Find chapters under root.
 
     A folder or .cbz/.zip whose name matches the pattern is a chapter. Other
@@ -29,19 +29,26 @@ def scan(root: Path, regex: re.Pattern, max_depth: int = 3, exclude: tuple[Path,
     """
     result = ScanResult()
     excluded = {p.resolve() for p in exclude}
-    _walk(root, root, regex, None, 0, max_depth, excluded, result)
+    _walk(root, root, patterns, None, 0, max_depth, excluded, result)
     result.chapters.sort(key=lambda c: (c.number, natural_key(c.name)))
     return result
 
 
-def _walk(root, folder, regex, inherited_volume, depth, max_depth, excluded, result) -> int:
+def _walk(root, folder, patterns, inherited_volume, depth, max_depth, excluded, result) -> int:
     found = 0
-    for entry in sorted(folder.iterdir(), key=lambda p: natural_key(p.name)):
+    try:
+        entries = sorted(folder.iterdir(), key=lambda p: natural_key(p.name))
+    except OSError as e:
+        if folder == root:
+            raise
+        result.issues.append(Issue("unreadable", f"cannot read folder {folder.relative_to(root).as_posix()}: {e}"))
+        return 0
+    for entry in entries:
         if entry.name.startswith(".") or (excluded and entry.resolve() in excluded):
             continue
         rel = entry.relative_to(root).as_posix()
         if entry.is_dir():
-            parsed = parse_name(entry.name, regex)
+            parsed = parse_name(entry.name, patterns)
             if parsed:
                 result.chapters.append(_chapter(entry, parsed, inherited_volume, _folder_pages(entry, result)))
                 found += 1
@@ -49,13 +56,13 @@ def _walk(root, folder, regex, inherited_volume, depth, max_depth, excluded, res
             sub = 0
             if depth < max_depth:
                 volume = volume_from_dir(entry.name)
-                sub = _walk(root, entry, regex, volume if volume is not None else inherited_volume,
+                sub = _walk(root, entry, patterns, volume if volume is not None else inherited_volume,
                             depth + 1, max_depth, excluded, result)
             if not sub:
                 result.skipped.append(rel)
             found += sub
         elif entry.is_file() and entry.suffix.lower() in ARCHIVE_EXTS:
-            parsed = parse_name(entry.stem, regex)
+            parsed = parse_name(entry.stem, patterns)
             if not parsed:
                 continue
             pages = _archive_pages(entry, result)

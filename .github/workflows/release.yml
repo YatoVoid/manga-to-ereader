@@ -3,29 +3,147 @@ name: release
 on:
   push:
     tags: ["v*"]
+  workflow_dispatch:
 
 permissions:
   contents: write
 
+env:
+  QT_QPA_PLATFORM: offscreen
+
 jobs:
-  windows-exe:
+  windows:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: python -m pip install ".[gui]" pytest "pyinstaller>=6.6"
+      - run: python -m pip install ".[gui]" pytest "pyinstaller>=6.6" pillow
       - run: python -m pytest -q
       - name: Build Tankobon.exe (desktop app)
-        run: pyinstaller --noconfirm --onefile --windowed --name Tankobon packaging/tankobon-gui.py
+        run: pyinstaller --noconfirm --onefile --windowed --name Tankobon --icon src/tankobon/icon.png --collect-data tankobon packaging/tankobon-gui.py
       - name: Build tankobon-cli.exe (command line)
-        run: pyinstaller --noconfirm --onefile --console --exclude-module PySide6 --name tankobon-cli packaging/tankobon-cli.py
-      - name: Check the CLI exe runs
-        run: dist/tankobon-cli.exe --version
+        run: pyinstaller --noconfirm --onefile --console --exclude-module PySide6 --name tankobon-cli --icon src/tankobon/icon.png packaging/tankobon-cli.py
+      - run: dist/tankobon-cli.exe --version
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: |
+            dist/Tankobon.exe
+            dist/tankobon-cli.exe
+
+  linux:
+    # Oldest supported runner, so the binaries run on older glibc too.
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: sudo apt-get update && sudo apt-get install -y libegl1 libgl1 libxkbcommon0 libfontconfig1 libdbus-1-3 libxcb-cursor0
+      - run: python -m pip install ".[gui]" pytest "pyinstaller>=6.6" pillow
+      - run: python -m pytest -q
+      - name: Build binaries
+        run: |
+          pyinstaller --noconfirm --windowed --onedir --name tankobon-gui --collect-data tankobon packaging/tankobon-gui.py
+          pyinstaller --noconfirm --onefile --exclude-module PySide6 --name tankobon packaging/tankobon-cli.py
+          dist/tankobon --version
+          timeout 8 dist/tankobon-gui/tankobon-gui || test $? -eq 124
+      - name: Package .deb, AppImage and tarball
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          case "$version" in [0-9]*) ;; *) version="0.0.0~dev" ;; esac
+          python -c "from PIL import Image; Image.open('src/tankobon/icon.png').resize((256, 256)).save('tankobon.png')"
+          mkdir -p out
+
+          deb=deb/tankobon
+          mkdir -p $deb/DEBIAN $deb/opt/tankobon $deb/usr/bin $deb/usr/share/applications $deb/usr/share/pixmaps
+          cp -r dist/tankobon-gui/. $deb/opt/tankobon/
+          cp dist/tankobon $deb/usr/bin/tankobon
+          ln -s /opt/tankobon/tankobon-gui $deb/usr/bin/tankobon-gui
+          cp packaging/linux/tankobon.desktop $deb/usr/share/applications/
+          cp tankobon.png $deb/usr/share/pixmaps/tankobon.png
+          cat > $deb/DEBIAN/control <<CONTROL
+          Package: tankobon
+          Version: $version
+          Section: graphics
+          Priority: optional
+          Architecture: amd64
+          Depends: libegl1, libgl1, libxkbcommon0, libfontconfig1, libdbus-1-3, libxcb-cursor0
+          Maintainer: YatoVoid <YatoVoid@users.noreply.github.com>
+          Homepage: https://github.com/YatoVoid/manga-to-ereader
+          Description: Pack manga chapters into one ordered .cbz per volume
+           Tankobon turns per-chapter manga downloads into one .cbz per volume,
+           ready for Kindle Comic Converter and e-readers.
+          CONTROL
+          sed -i 's/^          //' $deb/DEBIAN/control
+          dpkg-deb --build --root-owner-group $deb "out/tankobon_${version}_amd64.deb"
+
+          app=Tankobon.AppDir
+          mkdir -p $app/usr/bin
+          cp -r dist/tankobon-gui/. $app/usr/bin/
+          cp dist/tankobon $app/usr/bin/tankobon
+          cp packaging/linux/AppRun $app/AppRun
+          cp packaging/linux/tankobon.desktop tankobon.png $app/
+          wget -q https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage
+          chmod +x appimagetool-x86_64.AppImage
+          ARCH=x86_64 APPIMAGE_EXTRACT_AND_RUN=1 ./appimagetool-x86_64.AppImage $app out/Tankobon-x86_64.AppImage
+          APPIMAGE_EXTRACT_AND_RUN=1 out/Tankobon-x86_64.AppImage --version
+
+          tar_dir=tankobon-linux-x86_64
+          mkdir -p $tar_dir
+          cp -r dist/tankobon-gui/. $tar_dir/
+          cp dist/tankobon packaging/linux/tankobon.desktop tankobon.png $tar_dir/
+          tar -czf out/tankobon-linux-x86_64.tar.gz $tar_dir
+      - name: Check the .deb installs
+        run: |
+          sudo apt-get install -y ./out/tankobon_*_amd64.deb
+          tankobon --version
+          timeout 8 tankobon-gui || test $? -eq 124
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux
+          path: out/*
+
+  macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install ".[gui]" pytest "pyinstaller>=6.6" pillow
+      - run: python -m pytest -q
+      - name: Build Tankobon.app and the command line binary
+        run: |
+          pyinstaller --noconfirm --windowed --name Tankobon --icon src/tankobon/icon.png --collect-data tankobon \
+            --osx-bundle-identifier io.github.yatovoid.tankobon packaging/tankobon-gui.py
+          pyinstaller --noconfirm --onefile --exclude-module PySide6 --name tankobon packaging/tankobon-cli.py
+          dist/tankobon --version
+          perl -e 'alarm 8; exec @ARGV' dist/Tankobon.app/Contents/MacOS/Tankobon || test $? -eq 142
+      - name: Package .dmg and command line tarball
+        run: |
+          mkdir -p out dmg
+          cp -R dist/Tankobon.app dmg/
+          ln -s /Applications dmg/Applications
+          hdiutil create -volname Tankobon -srcfolder dmg -ov -format UDZO out/Tankobon-macos-arm64.dmg
+          tar -czf out/tankobon-cli-macos-arm64.tar.gz -C dist tankobon
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos
+          path: out/*
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [windows, linux, macos]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: assets
+          merge-multiple: true
       - uses: softprops/action-gh-release@v2
         with:
           generate_release_notes: true
-          files: |
-            dist/Tankobon.exe
-            dist/tankobon-cli.exe
+          files: assets/*

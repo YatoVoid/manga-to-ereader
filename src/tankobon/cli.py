@@ -56,6 +56,9 @@ def main(argv: list[str] | None = None) -> int:
     except (InputError, plan.PlanError) as e:
         print(f"tankobon: error: {e}", file=sys.stderr)
         return EXIT_USAGE
+    except OSError as e:
+        print(f"tankobon: error: {e}", file=sys.stderr)
+        return EXIT_BUILD_FAILED
     except KeyboardInterrupt:
         return 130
 

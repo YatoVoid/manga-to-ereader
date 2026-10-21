@@ -43,10 +43,10 @@ def load_project(root: Path, settings: Settings, exclude: tuple[Path, ...] = ())
     if not root.is_dir():
         raise InputError(f"not a folder: {root}")
     try:
-        regex = compile_pattern(settings.pattern)
+        patterns = compile_pattern(settings.pattern)
     except ValueError as e:
         raise InputError(str(e)) from None
-    found = scan(root, regex, settings.max_depth, exclude)
+    found = scan(root, patterns, settings.max_depth, exclude)
     overrides_path = settings.overrides_file
     if overrides_path is None and (root / OVERRIDES_NAME).is_file():
         overrides_path = root / OVERRIDES_NAME

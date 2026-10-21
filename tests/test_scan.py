@@ -77,3 +77,20 @@ def test_excluded_output_folder_is_not_scanned(tmp_path):
     make_chapter(tmp_path / "s" / "out", "Ch.0002")
     result = scan(tmp_path / "s", REGEX, exclude=(tmp_path / "s" / "out",))
     assert [c.number for c in result.chapters] == [Decimal(1)]
+
+
+def test_unreadable_subfolder_is_reported(tmp_path, monkeypatch):
+    from pathlib import Path
+    make_chapter(tmp_path / "s", "Ch.0001")
+    (tmp_path / "s" / "Locked").mkdir()
+    real_iterdir = Path.iterdir
+
+    def iterdir(self):
+        if self.name == "Locked":
+            raise PermissionError("denied")
+        return real_iterdir(self)
+
+    monkeypatch.setattr(Path, "iterdir", iterdir)
+    result = scan(tmp_path / "s", REGEX)
+    assert [c.number for c in result.chapters] == [Decimal(1)]
+    assert any(i.kind == "unreadable" for i in result.issues)

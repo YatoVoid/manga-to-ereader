@@ -5,12 +5,16 @@ import re
 from dataclasses import dataclass
 from decimal import Decimal
 
-# Matches "Vol.01 Ch.0001", "Ch.0093", "Volume 1 Chapter 3", "v01 c003", "c003".
+# Matches "Vol.01 Ch.0001", "Ch.0093", "Vol.TBD Ch.93", "[Group] Vol.2 Ch.10",
+# "Series Name Chapter 5", "Volume 1 Chapter 3", "v01 c003" and "c003".
 # Must define a "ch" group; "vol" is optional.
 DEFAULT_PATTERN = (
-    r"^(?:v(?:ol(?:ume)?)?\.?\s*(?P<vol>\d+)[\s._-]*)?"
-    r"(?:ch(?:apter)?|c)\.?\s*(?P<ch>\d+(?:\.\d+)?)"
+    r"^(?:.*?\bv(?:ol(?:ume)?)?\.?\s*(?P<vol>\d+)(?!\d))?"
+    r".*?\b(?:ch(?:ap(?:ter)?)?|c)\.?\s*(?P<ch>\d+(?:\.\d+)?)"
 )
+
+# Tried after the default pattern: a name that is only a chapter number, e.g. "093" or "93 - Title".
+NUMBER_ONLY_PATTERN = r"^(?P<ch>\d+(?:\.\d+)?)(?=$|[\s_(\[-])"
 
 # A folder that only names a volume, e.g. "Vol.03" or "Volume 3 - Title", holding chapter folders.
 VOLUME_DIR_PATTERN = re.compile(r"^v(?:ol(?:ume)?)?\.?\s*(?P<vol>\d+)(?!\d)", re.IGNORECASE)
@@ -36,18 +40,21 @@ class ParsedName:
     group: str = ""
 
 
-def compile_pattern(pattern: str | None = None) -> re.Pattern:
+def compile_pattern(pattern: str | None = None) -> list[re.Pattern]:
+    """Compile a user pattern, or the default patterns. Names are tried against each in order."""
+    if pattern is None:
+        return [re.compile(DEFAULT_PATTERN, re.IGNORECASE), re.compile(NUMBER_ONLY_PATTERN)]
     try:
-        regex = re.compile(pattern or DEFAULT_PATTERN, re.IGNORECASE)
+        regex = re.compile(pattern, re.IGNORECASE)
     except re.error as e:
         raise PatternError(f"invalid pattern: {e}") from None
     if "ch" not in regex.groupindex:
         raise PatternError("pattern must have a named group 'ch', e.g. (?P<ch>\\d+)")
-    return regex
+    return [regex]
 
 
-def parse_name(name: str, regex: re.Pattern) -> ParsedName | None:
-    m = regex.search(name)
+def parse_name(name: str, patterns: list[re.Pattern]) -> ParsedName | None:
+    m = next((m for regex in patterns if (m := regex.search(name))), None)
     if not m:
         return None
     vol = m.groupdict().get("vol")

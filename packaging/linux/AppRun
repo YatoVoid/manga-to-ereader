@@ -1,0 +1,7 @@
+#!/bin/sh
+here="$(dirname "$(readlink -f "$0")")"
+case "$1" in
+  build|interactive|--version|--help|-h) exec "$here/usr/bin/tankobon" "$@" ;;
+  gui) shift; exec "$here/usr/bin/tankobon-gui" "$@" ;;
+  *) exec "$here/usr/bin/tankobon-gui" "$@" ;;
+esac

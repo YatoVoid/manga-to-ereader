@@ -64,3 +64,10 @@ def test_custom_pattern(tmp_path):
                  "--pattern", r"Episode (?P<ch>\d+)"])
     assert code == EXIT_OK
     assert (out / "Show.cbz").is_file()
+
+
+def test_unwritable_output_is_a_clean_error(series, tmp_path, capsys):
+    blocker = tmp_path / "file"
+    blocker.write_text("x")
+    assert main(["build", str(series), "--out", str(blocker / "out")]) == 1
+    assert "tankobon: error:" in capsys.readouterr().err
