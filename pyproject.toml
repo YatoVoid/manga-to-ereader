@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "manga-to-ereader"
 version = "0.1.0"
-description = "Download manga, bundle chapters into volumes, and get them onto an e-reader"
+description = "Pack downloaded manga chapters into one ordered .cbz per volume, ready for e-reader conversion"
 readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE"]

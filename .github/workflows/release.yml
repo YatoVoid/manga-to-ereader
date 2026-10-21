@@ -20,7 +20,7 @@ jobs:
       - name: Build Tankobon.exe (desktop app)
         run: pyinstaller --noconfirm --onefile --windowed --name Tankobon packaging/tankobon-gui.py
       - name: Build tankobon-cli.exe (command line)
-        run: pyinstaller --noconfirm --onefile --console --name tankobon-cli packaging/tankobon-cli.py
+        run: pyinstaller --noconfirm --onefile --console --exclude-module PySide6 --name tankobon-cli packaging/tankobon-cli.py
       - name: Check the CLI exe runs
         run: dist/tankobon-cli.exe --version
       - uses: softprops/action-gh-release@v2

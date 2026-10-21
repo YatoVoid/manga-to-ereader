@@ -2,7 +2,7 @@
 
 # manga-to-ereader
 
-**Download manga for free, bundle it into volumes, convert it for your e-reader, and move the whole series over in one go.**
+**Download manga for free, pack it into one `.cbz` per volume, convert it for your e-reader, and move the whole series over in one go.**
 
 [![CI](https://github.com/YatoVoid/manga-to-ereader/actions/workflows/ci.yml/badge.svg)](https://github.com/YatoVoid/manga-to-ereader/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/YatoVoid/manga-to-ereader)](https://github.com/YatoVoid/manga-to-ereader/releases/latest)
@@ -11,29 +11,29 @@
 
 [**Download Tankobon**](https://github.com/YatoVoid/manga-to-ereader/releases/latest) · [The four steps](#the-four-steps) · [Tankobon app](#tankobon) · [Command line](#command-line)
 
-<img src="docs/screenshot.png" alt="Tankobon showing a series split into volumes, with a short chapter flagged" width="820">
+<img src="docs/screenshot.png" alt="Tankobon listing the .cbz file it will build for each volume, with a short chapter flagged" width="820">
 
 </div>
 
 ---
 
-Reading manga on an e-reader takes four free tools in a row. This repo walks through all of them and provides the missing piece in the middle: **Tankobon**, an app that turns hundreds of chapter folders into one tidy file per volume.
+Reading manga on an e-reader takes four free tools in a row. This repo walks through all of them and provides the missing piece in the middle: **Tankobon**, which packs the downloaded chapter folders into one `.cbz` per volume, pages in the right order, ready for Kindle Comic Converter.
 
 ```mermaid
 flowchart LR
-    A["<b>1. HaruNeko</b><br/>download chapters"] --> B["<b>2. Tankobon</b><br/>chapters to volumes"]
-    B --> C["<b>3. Kindle Comic Converter</b><br/>volumes to EPUB / KEPUB / MOBI"]
+    A["<b>1. HaruNeko</b><br/>download chapters"] --> B["<b>2. Tankobon</b><br/>volumes to .cbz"]
+    B --> C["<b>3. Kindle Comic Converter</b><br/>.cbz to EPUB / KEPUB / MOBI"]
     C --> D["<b>4. Calibre or Google Drive</b><br/>everything onto the reader"]
 ```
 
 | Step | Tool | Made by | What you get |
 |---|---|---|---|
 | 1 | [HaruNeko](https://github.com/manga-download/haruneko) | the HakuNeko team | One folder of images per chapter |
-| 2 | **Tankobon** | this repo | One `.cbz` per volume |
+| 2 | **Tankobon** | this repo | One `.cbz` per volume, every chapter in its volume, pages in order |
 | 3 | [Kindle Comic Converter](https://github.com/ciromattia/kcc) | ciromattia and contributors | Files sized and formatted for your exact device |
 | 4 | [Calibre](https://calibre-ebook.com/) or [Google Drive](https://drive.google.com) | Kovid Goyal / Google | The whole series on your e-reader |
 
-Why the middle step matters: a long series is 100+ chapter files. On an e-reader that means a cluttered library, broken reading progress, and a lot of tapping. Twenty volume files read like the books on a shelf.
+Why the middle step matters: KCC converts `.cbz` files, but HaruNeko gives you loose folders of images, one per chapter. A `.cbz` is just a zip archive of images with a different ending. Zipping each volume by hand means finding which chapters belong to it, getting the page order right (`10.jpg` must come after `9.jpg`, not after `1.jpg`), and working out where chapters with no volume number belong. Tankobon does all of that for the whole series in one click.
 
 ## The four steps
 
@@ -55,14 +55,16 @@ Monster Musume no Iru Nichijou/
 └── Ch.0093 (en) [Another Group]/
 ```
 
-### 2. Bundle the chapters into volumes with Tankobon
+### 2. Pack each volume into a .cbz with Tankobon
 
 1. Download **Tankobon.exe** from the [latest release](https://github.com/YatoVoid/manga-to-ereader/releases/latest) and open it. No install needed.
 2. Click **Browse** and choose the series folder from step 1.
 3. Check the plan. Every volume is listed with its chapters and page count. Chapters that look incomplete are marked **short**, and chapters whose volume was worked out for you are marked **guessed**.
 4. Click **Build**.
 
-The volume files are written to a new folder next to the series folder, named `<series> (cbz)`. Your downloaded chapters are not changed.
+For each volume, Tankobon collects its chapters in order, puts every page in reading order, zips them and saves the result as a `.cbz`. Chapters the website left without a volume number are placed in the volume they belong to by chapter number, so nothing is left out.
+
+The `.cbz` files are written to a new folder next to the series folder, named `<series> (cbz)`. Your downloaded chapters are not changed.
 
 <div align="center">
 <img src="docs/screenshot-build.png" alt="Tankobon after building four files, two volumes merged into one" width="820">
