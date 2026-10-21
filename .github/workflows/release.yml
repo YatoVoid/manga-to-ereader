@@ -48,6 +48,8 @@ jobs:
         run: |
           pyinstaller --noconfirm --windowed --onedir --name tankobon-gui --collect-data tankobon packaging/tankobon-gui.py
           pyinstaller --noconfirm --onefile --exclude-module PySide6 --name tankobon packaging/tankobon-cli.py
+          # The bundled fontconfig is older than the config files on current distros and floods stderr; use the system one.
+          rm -f dist/tankobon-gui/_internal/libfontconfig.so.1 dist/tankobon-gui/_internal/libfreetype.so.6
           dist/tankobon --version
           timeout 8 dist/tankobon-gui/tankobon-gui || test $? -eq 124
       - name: Package .deb, AppImage and tarball
@@ -70,7 +72,7 @@ jobs:
           Section: graphics
           Priority: optional
           Architecture: amd64
-          Depends: libegl1, libgl1, libxkbcommon0, libfontconfig1, libdbus-1-3, libxcb-cursor0
+          Depends: libegl1, libgl1, libxkbcommon0, libfontconfig1, libfreetype6, libdbus-1-3, libxcb-cursor0
           Maintainer: YatoVoid <YatoVoid@users.noreply.github.com>
           Homepage: https://github.com/YatoVoid/manga-to-ereader
           Description: Pack manga chapters into one ordered .cbz per volume

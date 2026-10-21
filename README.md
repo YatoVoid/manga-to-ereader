@@ -119,19 +119,29 @@ Kindles have no Google Drive support, so use Calibre for those.
 
 ### Install
 
-**Windows:** download from the [latest release](https://github.com/YatoVoid/manga-to-ereader/releases/latest):
+All downloads are on the [latest release](https://github.com/YatoVoid/manga-to-ereader/releases/latest) page. Each one includes both the desktop app (`Tankobon`) and the command line (`tankobon`).
 
-| File | What it is |
-|---|---|
-| `Tankobon.exe` | The desktop app shown above |
-| `tankobon-cli.exe` | The same thing for the command line |
+| System | Download | How to install |
+|---|---|---|
+| Windows | `Tankobon.exe`, `tankobon-cli.exe` | Nothing to install. Double-click `Tankobon.exe`. |
+| Arch, Manjaro, EndeavourOS | [AUR: `tankobon`](https://aur.archlinux.org/packages/tankobon) | `yay -S tankobon` |
+| Ubuntu, Debian, Mint, Pop!_OS | `tankobon_<version>_amd64.deb` | `sudo apt install ./tankobon_*_amd64.deb` |
+| Any other Linux | `Tankobon-x86_64.AppImage` | `chmod +x Tankobon-x86_64.AppImage`, then run it |
+| Linux, no install | `tankobon-linux-x86_64.tar.gz` | Unpack and run `tankobon-gui` or `tankobon` |
+| macOS (Apple Silicon) | `Tankobon-macos-arm64.dmg` | Open it and drag Tankobon into Applications |
+| macOS, command line | `tankobon-cli-macos-arm64.tar.gz` | Unpack and run `./tankobon` |
 
-Neither needs installing. The files are not code-signed, so the first time Windows SmartScreen asks you to confirm: click **More info**, then **Run anyway**.
+The AppImage also runs the command line: `./Tankobon-x86_64.AppImage build <folder>`. If it does not start, install `libfuse2` (Ubuntu) or `fuse2` (Arch, Fedora).
 
-**Linux, macOS or from source** (Python 3.10+):
+**First launch warnings.** The apps are not signed by Microsoft or Apple, so both systems ask once:
+
+- **Windows:** SmartScreen shows "Windows protected your PC". Click **More info**, then **Run anyway**.
+- **macOS:** right-click Tankobon in Applications and choose **Open**, then **Open** again. If macOS says the app is damaged, run `xattr -dr com.apple.quarantine /Applications/Tankobon.app` in Terminal.
+
+**From source** (any system with Python 3.10+, including Intel Macs):
 
 ```
-pip install "manga-to-ereader[gui] @ git+https://github.com/YatoVoid/manga-to-ereader"
+pipx install "manga-to-ereader[gui] @ git+https://github.com/YatoVoid/manga-to-ereader"
 tankobon-gui        # desktop app
 tankobon --help     # command line
 ```
@@ -212,8 +222,10 @@ $ tankobon interactive "Monster Musume no Iru Nichijou"
 
 ```
 Vol.01 Ch.0001 (en) [Group]        Vol.17 Ch.0067.5 - Cerea Prologue (en) [Group]
-Ch.0093 (en) [Group]               Volume 1 Chapter 3
-v01 c003                           c003
+Ch.0093 (en) [Group]               Vol.TBD Ch.93
+[Group] Vol.02 Ch.0010             Series Name Chapter 5
+Volume 1 Chapter 3                 v01 c003
+093                                12.5 - Extra
 ```
 
 Chapters can also be `.cbz` or `.zip` files, or sit inside volume folders like `Volume 3/Chapter 12/`. Pages are put in the order a person would expect (1, 2, 10, not 1, 10, 2) and bonus chapters land in the right place (26, 26.5, 27).
