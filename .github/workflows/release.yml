@@ -1,0 +1,30 @@
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  windows-exe:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install ".[gui]" pytest "pyinstaller>=6.6"
+      - run: python -m pytest -q
+      - name: Build manga-cbz-gui.exe
+        run: pyinstaller --noconfirm --onefile --windowed --name manga-cbz-gui packaging/manga-cbz-gui.py
+      - name: Build manga-cbz.exe (command line)
+        run: pyinstaller --noconfirm --onefile --console --name manga-cbz packaging/manga-cbz.py
+      - name: Check the CLI exe runs
+        run: dist/manga-cbz.exe --version
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/manga-cbz-gui.exe
+            dist/manga-cbz.exe
