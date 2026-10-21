@@ -2,7 +2,7 @@ import zipfile
 
 from conftest import make_chapter
 
-from manga_cbz.cli import EXIT_NO_CHAPTERS, EXIT_OK, EXIT_USAGE, EXIT_WARNINGS, main
+from tankobon.cli import EXIT_NO_CHAPTERS, EXIT_OK, EXIT_USAGE, EXIT_WARNINGS, main
 
 
 def test_dry_run_writes_nothing(series, tmp_path, capsys):

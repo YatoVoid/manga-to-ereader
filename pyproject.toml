@@ -3,9 +3,9 @@ requires = ["hatchling>=1.24"]
 build-backend = "hatchling.build"
 
 [project]
-name = "manga-cbz"
+name = "manga-to-ereader"
 version = "0.1.0"
-description = "Bundle per-chapter manga folders into one .cbz per volume"
+description = "Download manga, bundle chapters into volumes, and get them onto an e-reader"
 readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE"]
@@ -24,16 +24,16 @@ classifiers = [
 gui = ["PySide6>=6.6"]
 
 [project.scripts]
-manga-cbz = "manga_cbz.cli:main"
+tankobon = "tankobon.cli:main"
 
 [project.gui-scripts]
-manga-cbz-gui = "manga_cbz.gui:entry"
+tankobon-gui = "tankobon.gui:entry"
 
 [dependency-groups]
 dev = ["pytest>=8"]
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/manga_cbz"]
+packages = ["src/tankobon"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

@@ -14,7 +14,7 @@ from xml.etree import ElementTree as ET
 from .model import Bundle
 from .naming import ch_label
 
-MANIFEST_NAME = ".manga-cbz.json"
+MANIFEST_NAME = ".tankobon.json"
 WRITE_KINDS = {"write", "rebuild", "overwrite"}
 
 

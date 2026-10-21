@@ -2,8 +2,8 @@ from decimal import Decimal
 
 from conftest import JPEG, make_archive_chapter, make_chapter
 
-from manga_cbz.naming import compile_pattern
-from manga_cbz.scan import scan
+from tankobon.naming import compile_pattern
+from tankobon.scan import scan
 
 REGEX = compile_pattern()
 

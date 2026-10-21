@@ -2,7 +2,7 @@ from decimal import Decimal
 
 import pytest
 
-from manga_cbz.naming import (
+from tankobon.naming import (
     PatternError, ch_label, compile_pattern, natural_key, parse_name, safe_filename, volume_from_dir,
 )
 

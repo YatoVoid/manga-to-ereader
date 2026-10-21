@@ -5,8 +5,8 @@ import pytest
 
 from conftest import make_archive_chapter, make_chapter, snapshot
 
-from manga_cbz.build import MANIFEST_NAME, BuildOptions, Manifest, plan_actions, run_build, write_cbz
-from manga_cbz.project import Settings, load_project
+from tankobon.build import MANIFEST_NAME, BuildOptions, Manifest, plan_actions, run_build, write_cbz
+from tankobon.project import Settings, load_project
 
 
 def build_all(root, out, **kw):

@@ -2,10 +2,10 @@ from decimal import Decimal
 
 import pytest
 
-from manga_cbz import plan
-from manga_cbz.naming import compile_pattern
-from manga_cbz.project import InputError, Settings, load_project
-from manga_cbz.scan import scan
+from tankobon import plan
+from tankobon.naming import compile_pattern
+from tankobon.project import InputError, Settings, load_project
+from tankobon.scan import scan
 
 
 def chapters_of(root):

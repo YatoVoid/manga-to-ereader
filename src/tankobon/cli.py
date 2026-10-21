@@ -30,10 +30,10 @@ exit codes: 0 done, 1 a file failed to build, 2 bad arguments or input,
 3 no chapters found, 4 warnings with --strict
 
 examples:
-  manga-cbz build "Monster Musume no Iru Nichijou" --series "Monster Musume" --dry-run
-  manga-cbz build ./series --out ./cbz --assign 93-95=21 --comicinfo
-  manga-cbz build ./series --merge 1-3 --only 1-5
-  manga-cbz interactive ./series
+  tankobon build "Monster Musume no Iru Nichijou" --series "Monster Musume" --dry-run
+  tankobon build ./series --out ./cbz --assign 93-95=21 --comicinfo
+  tankobon build ./series --merge 1-3 --only 1-5
+  tankobon interactive ./series
 """
 
 
@@ -45,7 +45,7 @@ def main(argv: list[str] | None = None) -> int:
             try:
                 from .gui import main as gui_main
             except ImportError as e:
-                print(f"manga-cbz: error: {e}. Install the GUI extra: pip install 'manga-cbz[gui]'", file=sys.stderr)
+                print(f"tankobon: error: {e}. Install the GUI extra: pip install 'manga-to-ereader[gui]'", file=sys.stderr)
                 return EXIT_USAGE
             return gui_main(args.folder)
         project, opts = prepare(args)
@@ -54,7 +54,7 @@ def main(argv: list[str] | None = None) -> int:
             return run(project, opts)
         return build(project, opts, dry_run=args.dry_run, strict=args.strict)
     except (InputError, plan.PlanError) as e:
-        print(f"manga-cbz: error: {e}", file=sys.stderr)
+        print(f"tankobon: error: {e}", file=sys.stderr)
         return EXIT_USAGE
     except KeyboardInterrupt:
         return 130
@@ -62,7 +62,7 @@ def main(argv: list[str] | None = None) -> int:
 
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog="manga-cbz",
+        prog="tankobon",
         description="Bundle per-chapter manga folders into one .cbz per volume. Source folders are never modified.",
         epilog=EPILOG,
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -162,7 +162,7 @@ def format_action(action: Action) -> str:
 def build(project: Project, opts: BuildOptions, dry_run: bool = False, strict: bool = False) -> int:
     print_issues(project)
     if not project.chapters:
-        print(f"manga-cbz: no chapters found in {project.root}", file=sys.stderr)
+        print(f"tankobon: no chapters found in {project.root}", file=sys.stderr)
         return EXIT_NO_CHAPTERS
     manifest = Manifest(opts.out_dir)
     actions = plan_actions(project.bundles, opts, manifest)
@@ -173,7 +173,7 @@ def build(project: Project, opts: BuildOptions, dry_run: bool = False, strict: b
               " (* = volume guessed from chapter number)")
         return EXIT_WARNINGS if strict and (project.issues or project.skipped) else EXIT_OK
     if strict and (project.issues or project.skipped):
-        print("manga-cbz: warnings found and --strict given; nothing written", file=sys.stderr)
+        print("tankobon: warnings found and --strict given; nothing written", file=sys.stderr)
         return EXIT_WARNINGS
     if any(a.writes for a in actions) and is_synced_folder(opts.out_dir):
         print(f"warning: {opts.out_dir} looks like a OneDrive folder; every file written will be uploaded", file=sys.stderr)
@@ -185,7 +185,7 @@ def build(project: Project, opts: BuildOptions, dry_run: bool = False, strict: b
         size = action.target.stat().st_size / 1e6
         print(f"wrote {action.target.name}: {pages} pages, {size:.1f} MB [Ch.{plan.chapter_span(action.bundle.chapters)}]")
     for action, error in report.failed:
-        print(f"manga-cbz: failed {action.target.name}: {error}", file=sys.stderr)
+        print(f"tankobon: failed {action.target.name}: {error}", file=sys.stderr)
     print(f"done: {len(report.written)} files, {report.pages} pages written to {opts.out_dir}"
           " (* = volume guessed from chapter number)")
     return EXIT_BUILD_FAILED if report.failed else EXIT_OK
@@ -193,7 +193,7 @@ def build(project: Project, opts: BuildOptions, dry_run: bool = False, strict: b
 
 def _version() -> str:
     try:
-        return version("manga-cbz")
+        return version("manga-to-ereader")
     except PackageNotFoundError:
         return "unknown"
 

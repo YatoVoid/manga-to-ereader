@@ -48,7 +48,7 @@ class BuildWorker(QObject):
 class MainWindow(QMainWindow):
     def __init__(self, folder: Path | None = None):
         super().__init__()
-        self.setWindowTitle("manga-cbz")
+        self.setWindowTitle("Tankobon")
         self.resize(1000, 700)
         self.project: Project | None = None
         self.history: list[list[Bundle]] = []
@@ -407,7 +407,7 @@ def main(folder: Path | None = None) -> int:
 
 
 def entry() -> int:
-    """Entry point for the manga-cbz-gui script and the .exe: an optional folder argument."""
+    """Entry point for the tankobon-gui script and the .exe: an optional folder argument."""
     args = [a for a in sys.argv[1:] if not a.startswith("-")]
     return main(Path(args[0]) if args else None)
 

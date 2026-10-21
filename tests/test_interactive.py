@@ -1,7 +1,7 @@
-from manga_cbz.build import BuildOptions
-from manga_cbz.cli import EXIT_OK
-from manga_cbz.interactive import run
-from manga_cbz.project import Settings, load_project
+from tankobon.build import BuildOptions
+from tankobon.cli import EXIT_OK
+from tankobon.interactive import run
+from tankobon.project import Settings, load_project
 
 
 def session(series, tmp_path, *lines):
