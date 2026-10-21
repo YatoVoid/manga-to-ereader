@@ -133,6 +133,7 @@ class MainWindow(QMainWindow):
         self.move_btn.clicked.connect(self.move)
         self.undo_btn = QPushButton("Undo")
         self.undo_btn.clicked.connect(self.undo)
+        self.undo_btn.setEnabled(False)
         all_btn = QPushButton("Check all")
         all_btn.clicked.connect(lambda: self.set_all(True))
         none_btn = QPushButton("Check none")

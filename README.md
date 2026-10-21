@@ -11,7 +11,9 @@
 
 [**Download Tankobon**](https://github.com/YatoVoid/manga-to-ereader/releases/latest) · [The four steps](#the-four-steps) · [Tankobon app](#tankobon) · [Command line](#command-line)
 
-<img src="docs/screenshot.png" alt="Tankobon listing the .cbz file it will build for each volume, with a short chapter flagged" width="820">
+<img src="docs/demo.gif" alt="Tankobon demo: choose a series folder, review the volumes, click Build, get one .cbz per volume" width="820">
+
+<sub>26-second demo. <a href="docs/demo.mp4">Full-resolution MP4</a></sub>
 
 </div>
 
@@ -137,6 +139,8 @@ tankobon --help     # command line
 Leave out `[gui]` for the command line only. It has no other dependencies.
 
 ### Using the app
+
+<img src="docs/screenshot.png" alt="Tankobon listing the .cbz file it will build for each volume, with a short chapter flagged" width="820">
 
 - **Untick** volumes you don't want to build.
 - **Expand** a volume to see each chapter, its page count and any warnings.
