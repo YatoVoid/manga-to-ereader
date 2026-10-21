@@ -18,7 +18,7 @@ def test_window_scans_merges_and_undoes(app, series, tmp_path):
     window.refresh()
     tree = window.tree
     assert tree.topLevelItemCount() == 2
-    assert not window.undo_btn.isEnabled() or window.history
+    assert not window.undo_btn.isEnabled()
 
     tree.topLevelItem(0).setSelected(True)
     tree.topLevelItem(1).setSelected(True)

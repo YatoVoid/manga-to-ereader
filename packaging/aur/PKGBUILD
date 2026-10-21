@@ -1,0 +1,40 @@
+# Maintainer: YatoVoid
+pkgname=tankobon
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="Pack downloaded manga chapters into one ordered .cbz per volume, ready for e-reader conversion"
+arch=('any')
+url="https://github.com/YatoVoid/manga-to-ereader"
+license=('MIT')
+depends=('python' 'pyside6')
+makedepends=('python-build' 'python-installer' 'python-hatchling')
+checkdepends=('python-pytest')
+source=("$pkgname-$pkgver.tar.gz::$url/archive/refs/tags/v$pkgver.tar.gz")
+sha256sums=('9bad8aa106f9230ef5708a5c7523c4ed1554b8cb78c0d46ee76558e4198c649f')
+
+build() {
+  cd "manga-to-ereader-$pkgver"
+  python -m build --wheel --no-isolation
+}
+
+check() {
+  cd "manga-to-ereader-$pkgver"
+  PYTHONPATH=src QT_QPA_PLATFORM=offscreen python -m pytest -q
+}
+
+package() {
+  cd "manga-to-ereader-$pkgver"
+  python -m installer --destdir="$pkgdir" dist/*.whl
+  install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+  install -Dm644 /dev/stdin "$pkgdir/usr/share/applications/tankobon.desktop" <<DESKTOP
+[Desktop Entry]
+Type=Application
+Name=Tankobon
+GenericName=Manga CBZ Packer
+Comment=Pack manga chapters into one .cbz per volume
+Exec=tankobon-gui %f
+Icon=folder-pictures
+Terminal=false
+Categories=Graphics;Viewer;Utility;
+DESKTOP
+}
