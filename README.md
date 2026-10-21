@@ -9,7 +9,7 @@
 [![Python](https://img.shields.io/badge/python-3.10%2B-3776AB)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-[**Download Tankobon**](https://github.com/YatoVoid/manga-to-ereader/releases/latest) · [The four steps](#the-four-steps) · [Tankobon app](#tankobon) · [Command line](#command-line)
+[**Download Tankobon**](https://github.com/YatoVoid/manga-to-ereader/releases/latest) · [The four steps](#the-four-steps) · [Install](#install-tankobon) · [Using Tankobon](#using-tankobon) · [Command line](#command-line)
 
 <img src="docs/demo.gif" alt="Tankobon demo: choose a series folder, review the volumes, click Build, get one .cbz per volume" width="820">
 
@@ -59,7 +59,7 @@ Monster Musume no Iru Nichijou/
 
 ### 2. Pack each volume into a .cbz with Tankobon
 
-1. Download **Tankobon.exe** from the [latest release](https://github.com/YatoVoid/manga-to-ereader/releases/latest) and open it. No install needed.
+1. Install Tankobon for your system ([Windows, macOS and Linux instructions](#install-tankobon)) and open it.
 2. Click **Browse** and choose the series folder from step 1.
 3. Check the plan. Every volume is listed with its chapters and page count. Chapters that look incomplete are marked **short**, and chapters whose volume was worked out for you are marked **guessed**.
 4. Click **Build**.
@@ -115,40 +115,172 @@ Kindles have no Google Drive support, so use Calibre for those.
 
 ---
 
-## Tankobon
+## Install Tankobon
 
-### Install
+Every download is on the [latest release](https://github.com/YatoVoid/manga-to-ereader/releases/latest) page, under **Assets**. Find your system below.
 
-All downloads are on the [latest release](https://github.com/YatoVoid/manga-to-ereader/releases/latest) page. Each one includes both the desktop app (`Tankobon`) and the command line (`tankobon`).
+| Your system | What to get |
+|---|---|
+| [Windows 10 / 11](#windows) | `Tankobon.exe` |
+| [macOS, Apple Silicon (M1 and newer)](#macos) | `Tankobon-macos-arm64.dmg` |
+| [macOS, Intel](#from-source-any-system) | Install from source |
+| [Arch, Manjaro, EndeavourOS, CachyOS, Garuda](#arch-linux-and-derivatives) | `yay -S tankobon` |
+| [Ubuntu, Debian, Linux Mint, Pop!_OS, Zorin, elementary](#ubuntu-debian-and-derivatives) | `tankobon_<version>_amd64.deb` |
+| [Fedora, openSUSE, and any other Linux](#fedora-opensuse-and-any-other-linux) | `Tankobon-x86_64.AppImage` |
+| [Linux on ARM, Raspberry Pi, anything else](#from-source-any-system) | Install from source |
 
-| System | Download | How to install |
-|---|---|---|
-| Windows | `Tankobon.exe`, `tankobon-cli.exe` | Nothing to install. Double-click `Tankobon.exe`. |
-| Arch, Manjaro, EndeavourOS | [AUR: `tankobon`](https://aur.archlinux.org/packages/tankobon) | `yay -S tankobon` |
-| Ubuntu, Debian, Mint, Pop!_OS | `tankobon_<version>_amd64.deb` | `sudo apt install ./tankobon_*_amd64.deb` |
-| Any other Linux | `Tankobon-x86_64.AppImage` | `chmod +x Tankobon-x86_64.AppImage`, then run it |
-| Linux, no install | `tankobon-linux-x86_64.tar.gz` | Unpack and run `tankobon-gui` or `tankobon` |
-| macOS (Apple Silicon) | `Tankobon-macos-arm64.dmg` | Open it and drag Tankobon into Applications |
-| macOS, command line | `tankobon-cli-macos-arm64.tar.gz` | Unpack and run `./tankobon` |
+Every option includes both the desktop app and the `tankobon` command line.
 
-The AppImage also runs the command line: `./Tankobon-x86_64.AppImage build <folder>`. If it does not start, install `libfuse2` (Ubuntu) or `fuse2` (Arch, Fedora).
+### Windows
 
-**First launch warnings.** The apps are not signed by Microsoft or Apple, so both systems ask once:
+1. Download **`Tankobon.exe`** from the [latest release](https://github.com/YatoVoid/manga-to-ereader/releases/latest).
+2. Move it somewhere it can stay, such as your Desktop or Documents folder.
+3. Double-click it.
+4. The first time, Windows shows **"Windows protected your PC"** because the app isn't signed by Microsoft. Click **More info**, then **Run anyway**. It won't ask again.
 
-- **Windows:** SmartScreen shows "Windows protected your PC". Click **More info**, then **Run anyway**.
-- **macOS:** right-click Tankobon in Applications and choose **Open**, then **Open** again. If macOS says the app is damaged, run `xattr -dr com.apple.quarantine /Applications/Tankobon.app` in Terminal.
+**Command line:** download `tankobon-cli.exe` as well, open PowerShell in the folder you saved it to, and run:
 
-**From source** (any system with Python 3.10+, including Intel Macs):
-
-```
-pipx install "manga-to-ereader[gui] @ git+https://github.com/YatoVoid/manga-to-ereader"
-tankobon-gui        # desktop app
-tankobon --help     # command line
+```powershell
+.\tankobon-cli.exe build "C:\Users\you\Manga\Monster Musume no Iru Nichijou"
 ```
 
-Leave out `[gui]` for the command line only. It has no other dependencies.
+**Uninstall:** delete the `.exe` files.
 
-### Using the app
+### macOS
+
+For Macs with Apple Silicon (M1, M2, M3, M4 and newer). To check, open the Apple menu and choose **About This Mac**. If it says **Intel**, use [From source](#from-source-any-system) instead.
+
+1. Download **`Tankobon-macos-arm64.dmg`** from the [latest release](https://github.com/YatoVoid/manga-to-ereader/releases/latest).
+2. Open it and drag **Tankobon** into **Applications**.
+3. The first time, open **Applications**, right-click **Tankobon**, choose **Open**, then click **Open** again. The app isn't signed by Apple, so a normal double-click is blocked the first time only.
+4. If macOS says the app **is damaged and can't be opened**, open **Terminal** and run:
+
+   ```
+   xattr -dr com.apple.quarantine /Applications/Tankobon.app
+   ```
+
+**Command line:** download `tankobon-cli-macos-arm64.tar.gz`, then in Terminal:
+
+```
+cd ~/Downloads
+tar -xzf tankobon-cli-macos-arm64.tar.gz
+xattr -d com.apple.quarantine tankobon
+sudo mkdir -p /usr/local/bin
+sudo mv tankobon /usr/local/bin/
+tankobon --help
+```
+
+**Uninstall:** drag Tankobon from Applications to the Trash.
+
+### Arch Linux and derivatives
+
+Tankobon is in the AUR as [`tankobon`](https://aur.archlinux.org/packages/tankobon). It works on Arch, Manjaro, EndeavourOS, CachyOS, Garuda and other Arch-based systems.
+
+With an AUR helper:
+
+```
+yay -S tankobon        # or: paru -S tankobon
+```
+
+Without one:
+
+```
+sudo pacman -S --needed git base-devel
+git clone https://aur.archlinux.org/tankobon.git
+cd tankobon
+makepkg -si
+```
+
+Open **Tankobon** from your app menu, or run `tankobon-gui`. The command line is `tankobon`.
+
+**Update:** `yay -Syu`. **Uninstall:** `sudo pacman -R tankobon`.
+
+### Ubuntu, Debian and derivatives
+
+Works on Ubuntu 22.04 and newer, Debian 12 and newer, and systems based on them: Linux Mint, Pop!_OS, Zorin OS, elementary OS, KDE neon.
+
+1. Download **`tankobon_<version>_amd64.deb`** from the [latest release](https://github.com/YatoVoid/manga-to-ereader/releases/latest).
+2. Install it. Either double-click the file and click **Install**, or open a terminal and run:
+
+   ```
+   cd ~/Downloads
+   sudo apt install ./tankobon_*_amd64.deb
+   ```
+
+3. Open **Tankobon** from your app menu, or run `tankobon-gui`. The command line is `tankobon`.
+
+**Update:** download the new `.deb` and install it the same way. **Uninstall:** `sudo apt remove tankobon`.
+
+### Fedora, openSUSE and any other Linux
+
+The AppImage runs on almost any 64-bit Linux without installing anything.
+
+1. Download **`Tankobon-x86_64.AppImage`** from the [latest release](https://github.com/YatoVoid/manga-to-ereader/releases/latest).
+2. Make it runnable. Right-click it, open **Properties**, and turn on **Allow executing as a program**. Or in a terminal:
+
+   ```
+   chmod +x ~/Downloads/Tankobon-x86_64.AppImage
+   ```
+
+3. Double-click it, or run `~/Downloads/Tankobon-x86_64.AppImage`.
+
+If it doesn't start, your system is missing FUSE 2, which AppImages need:
+
+| System | Command |
+|---|---|
+| Fedora | `sudo dnf install fuse-libs` |
+| openSUSE | `sudo zypper install libfuse2` |
+| Ubuntu 24.04 and newer | `sudo apt install libfuse2t64` |
+| Arch | `sudo pacman -S fuse2` |
+
+**Command line:** the same file runs it. Put a subcommand after it:
+
+```
+~/Downloads/Tankobon-x86_64.AppImage build ~/Manga/"Monster Musume no Iru Nichijou"
+```
+
+**Without FUSE or an AppImage:** download `tankobon-linux-x86_64.tar.gz` instead, then:
+
+```
+tar -xzf tankobon-linux-x86_64.tar.gz
+./tankobon-linux-x86_64/tankobon-gui      # desktop app
+./tankobon-linux-x86_64/tankobon --help   # command line
+```
+
+**Uninstall:** delete the file or folder.
+
+### From source (any system)
+
+For Intel Macs, Linux on ARM (Raspberry Pi and others), or anything not listed above. Needs Python 3.10 or newer.
+
+1. Install pipx:
+
+   | System | Command |
+   |---|---|
+   | macOS | `brew install pipx` (needs [Homebrew](https://brew.sh)) |
+   | Windows | `py -m pip install --user pipx` |
+   | Ubuntu, Debian | `sudo apt install pipx` |
+   | Fedora | `sudo dnf install pipx` |
+   | Arch | `sudo pacman -S python-pipx` |
+
+2. Run `pipx ensurepath`, then close and reopen the terminal.
+3. Install Tankobon:
+
+   ```
+   pipx install "manga-to-ereader[gui] @ git+https://github.com/YatoVoid/manga-to-ereader"
+   ```
+
+4. Run `tankobon-gui` for the desktop app or `tankobon --help` for the command line.
+
+Leave out `[gui]` for the command line only. **Update:** `pipx upgrade manga-to-ereader`. **Uninstall:** `pipx uninstall manga-to-ereader`.
+
+### Check that it works
+
+Run `tankobon --version` (on Windows, `.\tankobon-cli.exe --version`). It prints the installed version, for example `tankobon 0.1.1`.
+
+## Using Tankobon
+
+### The desktop app
 
 <img src="docs/screenshot.png" alt="Tankobon listing the .cbz file it will build for each volume, with a short chapter flagged" width="820">
 
