@@ -10,9 +10,9 @@ REGEX = compile_pattern()
 
 
 @pytest.mark.parametrize("name, volume, chapter", [
-    ("Vol.01 Ch.0001 (en) [Monster Musume]", 1, "1"),
-    ("Vol.17 Ch.0067.5 - Cerea Prologue (en) [Monster Musume]", 17, "67.5"),
-    ("Ch.0093 (en) [Futari wa Pretty Anon]", None, "93"),
+    ("Vol.01 Ch.0001 (en) [Group]", 1, "1"),
+    ("Vol.17 Ch.0067.5 - Side Story (en) [Group]", 17, "67.5"),
+    ("Ch.0093 (en) [Another Group]", None, "93"),
     ("Volume 1 Chapter 3", 1, "3"),
     ("v01 c003", 1, "3"),
     ("c003", None, "3"),
@@ -31,11 +31,11 @@ def test_parse_name(name, volume, chapter):
 
 
 def test_parse_name_metadata():
-    parsed = parse_name("Vol.17 Ch.0067.5 - Cerea Prologue (en) [Monster Musume]", REGEX)
-    assert (parsed.title, parsed.language, parsed.group) == ("Cerea Prologue", "en", "Monster Musume")
+    parsed = parse_name("Vol.17 Ch.0067.5 - Side Story (en) [Group]", REGEX)
+    assert (parsed.title, parsed.language, parsed.group) == ("Side Story", "en", "Group")
 
 
-@pytest.mark.parametrize("name", ["Cerea", "Extras", "Vol.01", "cover", "Covers v2"])
+@pytest.mark.parametrize("name", ["Bonus", "Extras", "Vol.01", "cover", "Covers v2"])
 def test_parse_name_rejects(name):
     assert parse_name(name, REGEX) is None
 

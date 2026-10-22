@@ -30,7 +30,7 @@ exit codes: 0 done, 1 a file failed to build, 2 bad arguments or input,
 3 no chapters found, 4 warnings with --strict
 
 examples:
-  tankobon build "Monster Musume no Iru Nichijou" --series "Monster Musume" --dry-run
+  tankobon build "Series Name" --series "Series Name" --dry-run
   tankobon build ./series --out ./cbz --assign 93-95=21 --comicinfo
   tankobon build ./series --merge 1-3 --only 1-5
   tankobon interactive ./series

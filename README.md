@@ -50,7 +50,7 @@ Why the middle step matters: KCC converts `.cbz` files, but HaruNeko gives you l
 You end up with a folder named after the series, holding one folder per chapter:
 
 ```
-Monster Musume no Iru Nichijou/
+Series Name/
 ├── Vol.01 Ch.0001 (en) [Group]/      1.jpg  2.png  3.jpg ...
 ├── Vol.01 Ch.0002 (en) [Group]/
 ├── ...
@@ -141,7 +141,7 @@ Every option includes both the desktop app and the `tankobon` command line.
 **Command line:** download `tankobon-cli.exe` as well, open PowerShell in the folder you saved it to, and run:
 
 ```powershell
-.\tankobon-cli.exe build "C:\Users\you\Manga\Monster Musume no Iru Nichijou"
+.\tankobon-cli.exe build "C:\Users\you\Manga\Series Name"
 ```
 
 **Uninstall:** delete the `.exe` files.
@@ -236,7 +236,7 @@ If it doesn't start, your system is missing FUSE 2, which AppImages need:
 **Command line:** the same file runs it. Put a subcommand after it:
 
 ```
-~/Downloads/Tankobon-x86_64.AppImage build ~/Manga/"Monster Musume no Iru Nichijou"
+~/Downloads/Tankobon-x86_64.AppImage build ~/Manga/"Series Name"
 ```
 
 **Without FUSE or an AppImage:** download `tankobon-linux-x86_64.tar.gz` instead, then:
@@ -303,8 +303,8 @@ tankobon build <series folder> [options]
 Preview first, then build:
 
 ```
-tankobon build "Monster Musume no Iru Nichijou" --series "Monster Musume" --dry-run
-tankobon build "Monster Musume no Iru Nichijou" --series "Monster Musume"
+tankobon build "Series Name" --series "Series Name" --dry-run
+tankobon build "Series Name" --series "Series Name"
 ```
 
 | Option | What it does |
@@ -330,10 +330,10 @@ tankobon build "Monster Musume no Iru Nichijou" --series "Monster Musume"
 Review and edit the plan in the terminal before anything is written. Works over SSH.
 
 ```
-$ tankobon interactive "Monster Musume no Iru Nichijou"
-  1 [x] write      Monster Musume Vol.01.cbz  148p  Ch.1-4
+$ tankobon interactive "Series Name"
+  1 [x] write      Series Name Vol.01.cbz  148p  Ch.1-4
   ...
- 20 [x] write      Monster Musume Vol.20.cbz  259p  Ch.77-80, 81-83*
+ 20 [x] write      Series Name Vol.20.cbz  259p  Ch.77-80, 81-83*
 > m 19-20
 ```
 
@@ -353,7 +353,7 @@ $ tankobon interactive "Monster Musume no Iru Nichijou"
 **Folder names.** Tankobon recognizes the names HaruNeko, HakuNeko and Mihon/Tachiyomi use, and a few common others:
 
 ```
-Vol.01 Ch.0001 (en) [Group]        Vol.17 Ch.0067.5 - Cerea Prologue (en) [Group]
+Vol.01 Ch.0001 (en) [Group]        Vol.17 Ch.0067.5 - Side Story (en) [Group]
 Ch.0093 (en) [Group]               Vol.TBD Ch.93
 [Group] Vol.02 Ch.0010             Series Name Chapter 5
 Volume 1 Chapter 3                 v01 c003
